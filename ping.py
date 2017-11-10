@@ -2,17 +2,33 @@ import json
 from pprint import pprint
 import os
 import platform
-import concurrent.futures
+import multiprocessing
 
 # function of call psping and miscellous
-def f(i):
+def f(i,data):
     ip = data["configs"][i]["server"]
     port = str(data["configs"][i]["server_port"])
     remark = data["configs"][i]["remarks"]
     res = os.popen('psping -q -i 0 ' + ip + ':' + port + ' -nobanner').read()
     print('request for server ' + remark + '\n' + res)
-# main function    
-def main():
+@profile
+def notmultiprocess():
+    for i in range(count):
+        f(i,data)
+
+@profile
+def ismultiprocess():
+    jobs = []
+    for i in range(count):
+        p = multiprocessing.Process(target=f,args=(i,data))
+        p.start()
+        jobs.append(p)
+
+    for p in jobs:
+        p.join()
+    
+# main function
+if __name__ == '__main__':
     # ask for dir: gui-config.json
     dir = input('Enter the dir: ')
     # load json
@@ -21,15 +37,7 @@ def main():
     # count no. of servers
     count = len(data['configs'])
     pprint(count)
-    # psping each server
-    # lets try concurrent calling
-    # ThreadPool:
-    #with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-    #   for i in range (0,count):
-    #        executor.submit(f,i)
-    # ProcessPool:
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        for i in zip(range(0,count),executor.map(f,range(0,count)))
-        
-if __name__ == '__main__':
-    main()
+    # psping each server, multiprocessing
+
+    ismultiprocess()
+    notmultiprocess()
