@@ -1,8 +1,17 @@
 import json
-from pprint import pprint
 import os
-import platform
 import multiprocessing
+import time
+
+# profiler
+def profile(func):
+    def wrapper(*args, **kwargs):
+        import time
+        start = time.time()
+        func(*args, **kwargs)
+        end = time.time()
+        print ('COST: {}'.format(end - start))
+    return wrapper
 
 # function of call psping and miscellous
 def f(i,data):
@@ -11,6 +20,7 @@ def f(i,data):
     remark = data["configs"][i]["remarks"]
     res = os.popen('psping -q -i 0 ' + ip + ':' + port + ' -nobanner').read()
     print('request for server ' + remark + '\n' + res)
+
 @profile
 def notmultiprocess():
     for i in range(count):
@@ -36,8 +46,8 @@ if __name__ == '__main__':
         data = json.load(data_file)
     # count no. of servers
     count = len(data['configs'])
-    pprint(count)
+    print(count)
     # psping each server, multiprocessing
 
     ismultiprocess()
-    notmultiprocess()
+    #notmultiprocess()
