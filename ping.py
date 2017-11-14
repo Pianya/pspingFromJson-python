@@ -40,9 +40,10 @@ def ismultiprocess():
 # main function
 if __name__ == '__main__':
     # ask for dir: gui-config.json
-    dir = input('Enter the dir: ')
+    #dir = input('Enter the dir: ')
     # load json
-    with open (dir) as data_file:
+    import sys
+    with open (sys.argv[1]) as data_file:
         data = json.load(data_file)
     # count no. of servers
     count = len(data['configs'])
@@ -51,3 +52,5 @@ if __name__ == '__main__':
 
     ismultiprocess()
     #notmultiprocess()
+    # pause .exe for direct run
+    os.system("pause")
